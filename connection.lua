@@ -221,6 +221,7 @@ local function get_all_connected(node)
 				if  allow_connect(node_cd, to.node.name)
 				and allow_connect(to_cd, node.node.name) then
 					connected[#connected+1] = to
+					break
 				end
 			end
 		end
