@@ -149,7 +149,7 @@ local function connect(a,b)
 end
 c.connect = connect
 
--- Disconnect a from b
+-- Disconnect b from a
 -- a - npos of a node
 -- b - npos of other node
 local function disconnect(a, b)
@@ -234,6 +234,8 @@ local function disconnect_all(node)
 	local node_cd = c.get_circuit_def(node.node.name)
 	for _, other in ipairs(get_all_connected(node)) do
 		disconnect(node, other)
+		set_connections(other)
 	end
 end
+c.disconnect_all = disconnect_all
 

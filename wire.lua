@@ -61,6 +61,8 @@ local wire = {
 		c.connect_all(pos)
 	end,
 	after_destruct = function(pos, old_node)
+		pos.node = old_node
+		c.disconnect_all(pos)
 	end,
 
 	--[[
