@@ -1,27 +1,15 @@
 local c = circuits
 
-local function get_connect_points(node,pos)
-	local power = c.wallmount_real_pos(node.param2,{x=0,y=-2,z=0},pos)
-	local as = c.wallmount_real_pos(node.param2,{x=0,y=-1,z=0},pos)
-	return power,as
-end
-
 local function power_on(node,pos)
-	local power,as = get_connect_points(node,pos)
 	local on = table.copy(node)
-	on.name = c.get_on(node.name)
-	c.power(power,as)
+	on.name = "circuits:pressure_plate_on"
 	minetest.swap_node(pos,on)
 end
 
 local function power_off(node,pos,replace)
-	local power,as = get_connect_points(node,pos)
 	local off = table.copy(node)
-	off.name = c.get_off(node.name)
-	c.unpower(power,as)
-	if replace then
-		minetest.swap_node(pos,off)
-	end
+	off.name = "circuits:pressure_plate_off"
+	minetest.swap_node(pos,off)
 end
 	
 local pressure_plate = {
@@ -46,47 +34,48 @@ local pressure_plate = {
 	sunlight_propagates = true,
 	is_ground_content = false,
 	walkable = false,
-	groups = {dig_immediate=3,source=1},
-	after_place_node = function(pos)
+	groups = {dig_immediate=3,source=1, circuit_power=1},
+	on_rightclick = function(pos,node)
+		local flags = minetest.get_meta(pos):get_int("connect")
+		pos.node = node
+		minetest.chat_send_all(flags)
+		for _,real in pairs(c.get_all_connected(pos)) do
+			local dir = c.rot_relative_pos(pos, real)
+			minetest.chat_send_all("{ " .. dir.x ..  ","
+				.. dir.y .. "," .. dir.z .. "}")
+		end
+		--]]
+	end,
+	--after_place_node = function(pos,placer,itemstack,pointed_thing)
+	on_construct = function(pos)
+		pos.node = minetest.get_node(pos)
+		c.connect_all(pos)
 		minetest.get_node_timer(pos):start(0.1)
 	end,
-	on_contruct = function(pos)
-		minetest.get_node_timer(pos):start(0.1)
+	after_destruct = function(pos, old_node)
+		pos.node = old_node
+		c.disconnect_all(pos)
 	end,
 	on_timer = function(pos,_)
 		local node = minetest.get_node(pos)
 		local entity = minetest.get_objects_inside_radius(pos,0.8)
 
 		if entity and #entity >= 1 then
-			if not c.is_on(node.name) then
-				power_on(node,pos)
-			end
+			power_on(node,pos)
 		else
-			if c.is_on(node.name) then
-				power_off(node,pos,true)
-			end
+			power_off(node,pos,true)
 		end
 		return true
 	end,
-	on_destruct = function(pos)
-		local node = minetest.get_node(pos)
-		if c.is_on(node.name) then
-			power_off(node,pos,false)
-		end
-	end,
+	circuits = {
+		connects = c.behind,
+		connects_to = {"circuit_consumer", "circuit_wire"},
+		store_connect = "meta",
+	},
 }
 
 c.register_on_off("circuits:pressure_plate",pressure_plate,
 {
-	connect = function(plate_pos,to_pos)
-		local node = minetest.get_node(plate_pos)
-		local powers,as = get_connect_points(node,plate_pos)
-		if vector.equals(to_pos,powers) then
-			return as,true
-		else
-			return nil
-		end
-	end,
 },
 {
 	tiles = {"default_mese_block.png^[colorize:#111:160"},
