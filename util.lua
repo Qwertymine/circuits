@@ -25,63 +25,40 @@ c.register_on_off = function(name,def,on_def,off_def)
 	minetest.register_node(name .. "_off",off)
 end
 
-c.is_on = function(name)
-	local def = minetest.registered_nodes[name]
-	if not def then
-		return false
-	end
-	return def.on == name
-end
-
-c.get_on = function(name)
-	local def = minetest.registered_nodes[name]
-	if not def then
+-- Get the circuits table of a node
+-- return nil if does not exist
+c.get_circuit_def = function(node_name)
+	local def = minetest.registered_nodes[node_name]
+	if not def or not def.circuits then
 		return nil
 	end
-	return def.on
-end
-	
-c.get_off = function(name)
-	local def = minetest.registered_nodes[name]
-	if not def then
-		return nil
-	end
-	return def.off
-end
 
-c.power = function(power,as)
+	return def.circuits
+end
+local get_cd = c.get_circuit_def
+
+-- Power a node
+-- from - pos of initiating node (powering)
+-- power - pos of recieving node (powered)
+-- return - bool if node is powered
+c.power = function(from, power)
 	local node = minetest.get_node(power)
-	local def = minetest.registered_nodes[node.name]
-	if not def or not def.power then
+	local def = get_cd(node.name)
+	if not def or not def.on_power then
 		return false
 	end
-	def.on_power(power,as)
+	return def.on_power(power, node, from)
 end
 
+-- Unpower a node
+-- from - pos of initiating node (powering)
+-- power - pos of recieving node (powered)
+-- return - bool if node is unpowered
 c.unpower = function(power,as)
 	local node = minetest.get_node(power)
 	local def = minetest.registered_nodes[node.name]
 	if not def or not def.unpower then
 		return false
 	end
-	def.on_unpower(power,as)
-end
-
-c.connect = function(recipient,other)
-	local node = minetest.get_node(other)
-	local def = minetest.registered_nodes[node.name]
-	if not def or not def.connect then
-		return nil,false
-	else
-		return def.connect(other,recipient)
-	end
-end
-
-c.is_wire = function(name)
-	local def = minetest.registered_nodes[name]
-	if not def or not def.groups then
-		return false
-	else
-		return def.groups.wire
-	end
+	return def.on_unpower(power, node, from)
 end

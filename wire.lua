@@ -1,18 +1,4 @@
 local c = circuits
-local max_dist = 2
-
--- Table of mask values for different connection points
-local connection_points = {
-	[c.hash_pos({x=0,y=1,z=0})] = 0x04,
-	[c.hash_pos({x=0,y=-1,z=0})] = 0x08,
-	[c.hash_pos({x=1,y=0,z=0})] = 0x10,
-	[c.hash_pos({x=-1,y=0,z=0})] = 0x20,
-	[c.hash_pos({x=0,y=0,z=1})] = 0x40,
-	[c.hash_pos({x=0,y=0,z=-1})] = 0x80,
-}
-
-c.register_wire = function(name,def)
-end
 
 local function is_wire(name)
 	local def = minetest.registered_nodes[name]
@@ -22,40 +8,6 @@ local function is_wire(name)
 		return true
 	end
 	return false
-end
-
-local function param_connection(param,wire,to)
-	local to_relative = c.hash_pos(c.relative_pos(wire,to))
-	param = bit.bor(param,connection_points[to_relative])
-	return param
-end
-
-local function connect_wire(wire,to)
-	local node = minetest.get_node(wire)
-	node.param2 = param_connection(node.param2,wire,to)
-	minetest.swap_node(wire,node)
-end
-
-local function connect_to_ajacent(pos)
-	local node = minetest.get_node(pos)
-	local param = node.param2
-	local powered = false
-	for i,_ in pairs(connection_points) do
-		for dist=1,max_dist do
-			local to = c.relative_real_pos(pos,vector.multiply(c.unhash_pos(i),dist))
-			local connection,powering = c.connect(node,pos,to)
-			if connection then
-				param = param_connection(param,pos,connection)
-				powered = powered or powering
-				break
-			end
-		end
-	end
-	node.param2 = param
-	minetest.swap_node(pos,node)
-	if powered then
-		power(pos)
-	end
 end
 
 local wire = {
@@ -90,12 +42,14 @@ local wire = {
 	sunlight_propagates = true,
 	is_ground_content = false,
 	walkable = true,
-	groups = {dig_immediate=3,wire=1},
-	connects_to = {"group:wire"},
+	groups = {dig_immediate=3,circuit_wire=1,circuit_raw_wire=1},
+	connects_to = {"group:circuit_wire"},
 	on_rightclick = function(pos,node)
-		minetest.chat_send_all(node.param2)
-		for k,v in pairs(connection_points) do
-			if bit.band(node.param2,v) ~= 0 then
+		--local flags = minetest.get_meta(pos):get_int("connect")
+		local flags = node.param2
+		minetest.chat_send_all(flags)
+		for k,v in pairs(c.dir_bits) do
+			if bit.band(flags,v) ~= 0 then
 				local dir = c.unhash_pos(k)
 				minetest.chat_send_all("{ " .. dir.x ..  ","
 					.. dir.y .. "," .. dir.z .. "}")
@@ -103,16 +57,22 @@ local wire = {
 		end
 		--]]
 	end,
-	after_place_node = function(pos,placer,itemstack,pointed_thing)
-		connect_to_ajacent(pos)
+	--after_place_node = function(pos,placer,itemstack,pointed_thing)
+	on_construct = function(pos)
+		pos.node = minetest.get_node(pos)
+		c.connect_all(pos)
 	end,
-	connect = function(this_pos,from_pos)
-		if connection_points[c.hash_pos(c.relative_pos(this_pos,from_pos))] then
-			connect_wire(this_pos,from_pos)
-			return this_pos, c.is_on(power_pos)
-		end
-		return nil
+	after_destruct = function(pos, old_node)
 	end,
+
+	--[[
+	--	Circuits properties definition area
+	--]]
+	circuits = {
+		connects = c.local_area,
+		connects_to = {"circuit_consumer", "circuit_wire", "circuit_power"},
+		store_connect = "param2",
+	},
 }
 
 c.register_on_off("circuits:wire",wire,{},
