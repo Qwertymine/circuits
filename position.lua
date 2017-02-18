@@ -228,6 +228,20 @@ circuits.rot_relative_pos = function(a, b)
 	end
 end
 	
+-- Takes two one npos and an rpos, and returns the real pos, relative to
+-- any rotation a might have
+-- a - npos a 
+-- rpos - rpos (b)
+circuits.rot_relative_real_pos = function(a, rpos)
+	local a_cd = circuits.get_circuit_def(a.node.name)
+	if a_cd.rot == "wallmounted" then
+		return circuits.wallmount_real_pos(a.node.param1, a, rpos)
+	elseif a_cd.rot == "facedir" then
+		return circuits.facedir_real_pos(a.node.param1, a, rpos)
+	else
+		return circuits.relative_real_pos(a, rpos)
+	end
+end
 
 
 --[[

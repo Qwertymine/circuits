@@ -188,6 +188,48 @@ local function connect_all(node)
 end
 c.connect_all = connect_all
 
+-- node - npos
+local function get_bit_flags(node)
+	local cd = c.get_circuit_def(node.node.name)
+	if cd.store_connect == "param" then
+		return node.node.param
+
+	elseif cd.store_connect == "param2" then
+		return node.node.param2
+
+	elseif cd.store_connect == "meta" then
+		local meta = minetest.get_meta(node)
+		return meta:get_int("connect")
+	end
+end
+
+-- node - npos
+local function get_all_connected(node)
+	local flags = get_bit_flags(node)
+	local connected = {}
+	for k,v in pairs(c.dir_bits) do
+		if bit.band(flags,v) ~= 0 then
+			for dist=1,max_dist do
+				local pos = vector.multiply(c.unhash_pos(k), dist)
+				local to = c.relative_real_pos(node,pos)
+				to.node = minetest.get_node(to)
+
+				local node_cd = c.get_circuit_def(node.node.name)
+				local to_cd = c.get_circuit_def(to.node.name)
+
+				-- If either is not allowed to connect - they cannot connect
+				if  allow_connect(node_cd, to.node.name)
+				and allow_connect(to_cd, node.node.name) then
+					connected[#connected+1] = to
+				end
+			end
+		end
+	end
+	return connected
+end
+c.get_all_connected = get_all_connected
+
+-- node - npos
 local function disconnect_all(node)
 	local node_cd = c.get_circuit_def(node.node.name)
 	for _, other in ipairs(get_all_connected(node)) do

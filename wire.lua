@@ -45,15 +45,13 @@ local wire = {
 	groups = {dig_immediate=3,circuit_wire=1,circuit_raw_wire=1},
 	connects_to = {"group:circuit_wire"},
 	on_rightclick = function(pos,node)
-		--local flags = minetest.get_meta(pos):get_int("connect")
 		local flags = node.param2
+		pos.node = node
 		minetest.chat_send_all(flags)
-		for k,v in pairs(c.dir_bits) do
-			if bit.band(flags,v) ~= 0 then
-				local dir = c.unhash_pos(k)
-				minetest.chat_send_all("{ " .. dir.x ..  ","
-					.. dir.y .. "," .. dir.z .. "}")
-			end
+		for _,real in pairs(c.get_all_connected(pos)) do
+			local dir = c.rot_relative_pos(pos, real)
+			minetest.chat_send_all("{ " .. dir.x ..  ","
+				.. dir.y .. "," .. dir.z .. "}")
 		end
 		--]]
 	end,
