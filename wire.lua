@@ -31,18 +31,48 @@ local function get_wire_network(npos)
 			end
 		end
 	end
-	return network, powered, (#network > max_net_items)
+	return network, powered, (#network <= max_net_items)
 end
 
 c.wire_update = function(npos)
+	minetest.chat_send_all("Enter")
 	if not npos then
 		return false
 	end
 
 	local network, powered, complete = get_wire_network(npos)
+	minetest.chat_send_all("Comp")
 	if not complete then
 		return false
 	end
+
+	minetest.chat_send_all("Power")
+	if  powered
+	and c.is_on(npos) then
+		return true
+	elseif not powered
+	and    not c.is_on(npos) then
+		return true
+	end
+
+	minetest.chat_send_all("Switch")
+	local to_function
+	if powered then
+		to_function = c.get_powered
+	else
+		to_function = c.get_off
+	end
+
+	for _, node in ipairs(network) do
+		if is_wire(node.node.name) then
+			node.node.name = to_function(node)
+			minetest.swap_node(node,node.node)
+		elseif minetest.get_item_group(node.node.name,"circuit_consumer") > 0 then
+			c.update(node)
+		end
+	end
+
+	return true
 end
 
 local wire = {
@@ -109,6 +139,7 @@ local wire = {
 		connects = c.local_area,
 		connects_to = {"circuit_consumer", "circuit_wire", "circuit_power"},
 		store_connect = "param2",
+		on_update = c.wire_update,
 	},
 }
 

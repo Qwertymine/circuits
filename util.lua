@@ -34,6 +34,37 @@ c.get_circuit_def = function(node_name)
 end
 local get_cd = c.get_circuit_def
 
+c.get_powered = function(npos)
+	local cd = c.get_circuit_def(npos.node.name)
+
+	if not cd
+	or not cd.powered then
+		return nil
+	end
+
+	return cd.powered
+end
+
+c.get_off = function(npos)
+	local cd = c.get_circuit_def(npos.node.name)
+
+	if not cd
+	or not cd.off then
+		return nil
+	end
+
+	return cd.off
+end
+
+c.is_on = function(npos)
+	if npos.node.name == c.get_off(npos) then
+		return false
+	end
+	if npos.node.name == c.get_powered(npos) then
+		return true
+	end
+	return nil
+end
 -- Mutate a pos into an npos
 -- pos - a position
 -- [node] - a node
@@ -47,11 +78,4 @@ end
 
 c.pos_string = function(pos)
 	return "{" .. pos.x .. "," .. pos.y .. "," .. pos.z .. "}"
-end
-
--- Power a node
--- npos - npos of the powering? node
--- other - npos of the powered? node
--- return - bool if node is powered
-c.is_powering = function(npos, other)
 end
