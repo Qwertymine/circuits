@@ -1,17 +1,18 @@
 local c = circuits
 
-local function power_on(node,pos)
-	local on = table.copy(node)
-	on.name = "circuits:pressure_plate_on"
-	minetest.swap_node(pos,on)
+local on = "circuits:pressure_plate_on"
+local off = "circuits:pressure_plate_off"
+
+local function power_on(npos)
+	npos.node.name = on
+	minetest.swap_node(npos,npos.node)
 end
 
-local function power_off(node,pos,replace)
-	local off = table.copy(node)
-	off.name = "circuits:pressure_plate_off"
-	minetest.swap_node(pos,off)
+local function power_off(npos)
+	npos.node.name = off
+	minetest.swap_node(npos,npos.node)
 end
-	
+
 local pressure_plate = {
 	description = "Pressure Plate",
 	drawtype = "nodebox",
@@ -57,13 +58,15 @@ local pressure_plate = {
 		c.disconnect_all(pos)
 	end,
 	on_timer = function(pos,_)
-		local node = minetest.get_node(pos)
-		local entity = minetest.get_objects_inside_radius(pos,0.8)
+		local npos = c.npos(pos)
+		local entity = minetest.get_objects_inside_radius(npos,0.8)
 
 		if entity and #entity >= 1 then
-			power_on(node,pos)
+			c.power_update(npos,"on")
+			-- power_on(npos)
 		else
-			power_off(node,pos,true)
+			c.power_update(npos,"off")
+			-- power_off(npos)
 		end
 		return true
 	end,
@@ -71,6 +74,26 @@ local pressure_plate = {
 		connects = c.behind,
 		connects_to = {"circuit_consumer", "circuit_wire"},
 		store_connect = "meta",
+		on_update = function(npos, args)
+			if args == "on"
+			and npos.node.name == "circuits:pressure_plate_off" then
+				power_on(npos)
+				-- Trigger update of connected nodes
+				return true
+			elseif args =="off"
+			and npos.node.name == "circuits:pressure_plate_on" then
+				power_off(npos)
+				-- Trigger update of connected nodes
+				return true
+			end
+		end,
+		powering = function(npos, rpos)
+			if npos.node.name == "circuits:pressure_plate_on" then
+				return true
+			else
+				return false
+			end
+		end,
 	},
 }
 

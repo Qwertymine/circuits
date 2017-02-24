@@ -216,7 +216,7 @@ end
 -- Takes two npos and returns the rpos for a, relative to
 -- any rotation a might have
 -- a - npos a 
--- b - npos b
+-- b - pos b
 circuits.rot_relative_pos = function(a, b)
 	local a_cd = circuits.get_circuit_def(a.node.name)
 	if a_cd.rot == "wallmounted" then

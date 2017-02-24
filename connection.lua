@@ -203,27 +203,64 @@ local function get_bit_flags(node)
 	end
 end
 
+local function get_connected_in_dir(npos,dir,flags)
+	if not flags then
+		flags = get_bit_flags(npos)
+	end
+
+	local dir_bit = c.dir_bits[c.hash_pos(dir)]
+	if not dir_bit then
+		return nil
+	end
+
+	if bit.band(flags,dir_bit) == 0 then
+		return nil
+	end
+
+	for dist=1,max_dist do
+		local rpos = vector.multiply(dir, dist)
+		local to = c.npos(c.rot_relative_real_pos(npos,rpos))
+
+		local npos_cd = c.get_circuit_def(npos.node.name)
+		local to_cd = c.get_circuit_def(to.node.name)
+
+		-- If either is not allowed to connect - they cannot connect
+		if  allow_connect(npos_cd, to.node.name)
+		and allow_connect(to_cd, npos.node.name) then
+			return to
+		end
+	end
+
+	return nil
+end
+c.get_connected_in_dir = get_connected_in_dir
+
+local function is_connected(npos, to)
+	local dir = c.rpos_is_dir(npos,to)
+	if not dir then
+		return false
+	end
+
+	local found = get_connected_in_dir(npos,dir)
+	if not found then
+		return false
+	end
+
+	if not vector.equals(to,found) then
+		return false
+	end
+
+	return true
+end
+
 -- node - npos
 local function get_all_connected(node)
 	local flags = get_bit_flags(node)
 	local connected = {}
-	for k,v in pairs(c.dir_bits) do
-		if bit.band(flags,v) ~= 0 then
-			for dist=1,max_dist do
-				local pos = vector.multiply(c.unhash_pos(k), dist)
-				local to = c.relative_real_pos(node,pos)
-				to.node = minetest.get_node(to)
-
-				local node_cd = c.get_circuit_def(node.node.name)
-				local to_cd = c.get_circuit_def(to.node.name)
-
-				-- If either is not allowed to connect - they cannot connect
-				if  allow_connect(node_cd, to.node.name)
-				and allow_connect(to_cd, node.node.name) then
-					connected[#connected+1] = to
-					break
-				end
-			end
+	for dir_hash,_ in pairs(c.dir_bits) do
+		local to = get_connected_in_dir(node,c.unhash_pos(dir_hash),flags)
+		if to then
+			connected[#connected+1] = to
 		end
 	end
 	return connected

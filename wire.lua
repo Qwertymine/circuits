@@ -1,13 +1,7 @@
 local c = circuits
 
 local function is_wire(name)
-	local def = minetest.registered_nodes[name]
-	if not def or not def.groups then
-		return false
-	elseif def.groups.circuit_wire and def.groups.wire ~= 0 then
-		return true
-	end
-	return false
+	return minetest.get_item_group("circuit_wire") > 0
 end
 
 local max_net_items = 50
@@ -19,6 +13,7 @@ local function get_wire_network(npos)
 		if not item then
 			break
 		end
+
 		if is_wire(item.node.name) then
 			for _, node in ipairs(c.get_all_connected(item)) do
 				if not seen[c.hash_pos(node)] then
@@ -30,6 +25,7 @@ local function get_wire_network(npos)
 	end
 	return network
 end
+
 
 local wire = {
 	description = "Wire",
