@@ -1,13 +1,14 @@
 local c = circuits
 
 local function is_wire(name)
-	return minetest.get_item_group("circuit_wire") > 0
+	return minetest.get_item_group(name,"circuit_wire") > 0
 end
 
 local max_net_items = 50
 local function get_wire_network(npos)
 	local network = {npos}
 	local seen = {[c.hash_pos(npos)] = npos}
+	local powered = false
 	for i=1,max_net_items do
 		local item = network[i]
 		if not item then
@@ -22,10 +23,27 @@ local function get_wire_network(npos)
 				end
 			end
 		end
+		if minetest.get_item_group(item.node.name,"circuit_power") > 0 then
+			for _, node in ipairs(c.get_all_connected(item)) do
+				if seen[c.hash_pos(node)] then
+					powered = powered or c.is_powering(item, node)
+				end
+			end
+		end
 	end
-	return network
+	return network, powered, (#network > max_net_items)
 end
 
+c.wire_update = function(npos)
+	if not npos then
+		return false
+	end
+
+	local network, powered, complete = get_wire_network(npos)
+	if not complete then
+		return false
+	end
+end
 
 local wire = {
 	description = "Wire",
@@ -63,13 +81,15 @@ local wire = {
 	connects_to = {"group:circuit_wire", "group:circuit_consumer", "group:circuit_power"},
 	on_rightclick = function(pos,node)
 		local flags = node.param2
-		pos.node = node
+		pos = c.npos(pos,node)
 		minetest.chat_send_all(flags)
-		for _,real in pairs(get_wire_network(pos)) do
+		local network, powered = get_wire_network(pos)
+		for _,real in pairs(network) do
 			local dir = c.rot_relative_pos(pos, real)
 			minetest.chat_send_all("{ " .. dir.x ..  ","
 				.. dir.y .. "," .. dir.z .. "}")
 		end
+		minetest.chat_send_all(tostring(powered))
 		--]]
 	end,
 	--after_place_node = function(pos,placer,itemstack,pointed_thing)

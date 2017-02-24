@@ -236,7 +236,7 @@ end
 c.get_connected_in_dir = get_connected_in_dir
 
 local function is_connected(npos, to)
-	local dir = c.rpos_is_dir(npos,to)
+	local dir = c.rpos_is_dir(c.rot_relative_pos(npos,to))
 	if not dir then
 		return false
 	end
@@ -252,6 +252,7 @@ local function is_connected(npos, to)
 
 	return true
 end
+c.is_connected = is_connected
 
 -- node - npos
 local function get_all_connected(node)

@@ -79,13 +79,18 @@ local pressure_plate = {
 			and npos.node.name == "circuits:pressure_plate_off" then
 				power_on(npos)
 				-- Trigger update of connected nodes
-				return true
 			elseif args =="off"
 			and npos.node.name == "circuits:pressure_plate_on" then
 				power_off(npos)
 				-- Trigger update of connected nodes
-				return true
+			else
+				return false
 			end
+
+			for _,node in ipairs(c.get_all_connected(npos)) do
+				c.update(node)
+			end
+			return true
 		end,
 		powering = function(npos, rpos)
 			if npos.node.name == "circuits:pressure_plate_on" then

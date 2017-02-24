@@ -1,8 +1,12 @@
 local c = circuits
 
 c.register_on_off = function(name,def,on_def,off_def)
-	def.on = name .. "_on"
-	def.off = name .. "_off"
+	local name_on = name .. "_on"
+	local name_off = name .. "_off"
+
+	def.circuits = def.circuits or {}
+	def.circuits.powered = name_on
+	def.circuits.off = name_off
 
 	local on = table.copy(on_def)
 	local off = table.copy(off_def)
@@ -12,10 +16,10 @@ c.register_on_off = function(name,def,on_def,off_def)
 		off[k] = off[k] or v
 	end
 
-	on.drop = on.drop or def.off
+	on.drop = on.drop or name_off
 
-	minetest.register_node(name .. "_on",on)
-	minetest.register_node(name .. "_off",off)
+	minetest.register_node(name_on,on)
+	minetest.register_node(name_off,off)
 end
 
 -- Get the circuits table of a node

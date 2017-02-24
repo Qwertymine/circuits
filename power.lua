@@ -1,5 +1,17 @@
 local c = circuits
 
+c.is_powering = function(npos, node)
+	local cd = c.get_circuit_def(npos.node.name)
+
+	if not cd
+	or not cd.powering
+	or not c.is_connected(npos,node) then
+		return false
+	end
+
+	return cd.powering(npos,c.rot_relative_pos(npos,node))
+end
+
 -- c.pending is in persistance.lua
 local function insert_update(update, type)
 	if not update 
