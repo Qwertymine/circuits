@@ -186,6 +186,7 @@ local function connect_all(node)
 		end
 		end
 	end
+	c.update(node)
 	return node
 end
 c.connect_all = connect_all
@@ -196,6 +197,7 @@ local function disconnect_all(node)
 	for _, other in ipairs(c.get_all_connected(node)) do
 		disconnect(node, other)
 		set_connections(other)
+		c.update(other)
 	end
 end
 c.disconnect_all = disconnect_all
