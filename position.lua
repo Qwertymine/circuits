@@ -220,9 +220,9 @@ end
 circuits.rot_relative_pos = function(a, b)
 	local a_cd = circuits.get_circuit_def(a.node.name)
 	if a_cd.rot == "wallmounted" then
-		return circuits.pos_wallmount_relative(a.node.param1, a, b)
+		return circuits.pos_wallmount_relative(a.node.param2, a, b)
 	elseif a_cd.rot == "facedir" then
-		return circuits.pos_facedir_relative(a.node.param1, a, b)
+		return circuits.pos_facedir_relative(a.node.param2, a, b)
 	else
 		return circuits.relative_pos(a, b)
 	end
@@ -235,9 +235,9 @@ end
 circuits.rot_relative_real_pos = function(a, rpos)
 	local a_cd = circuits.get_circuit_def(a.node.name)
 	if a_cd.rot == "wallmounted" then
-		return circuits.wallmount_real_pos(a.node.param1, a, rpos)
+		return circuits.wallmount_real_pos(a.node.param2, a, rpos)
 	elseif a_cd.rot == "facedir" then
-		return circuits.facedir_real_pos(a.node.param1, a, rpos)
+		return circuits.facedir_real_pos(a.node.param2, a, rpos)
 	else
 		return circuits.relative_real_pos(a, rpos)
 	end

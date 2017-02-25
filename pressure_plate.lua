@@ -71,6 +71,7 @@ local pressure_plate = {
 		return true
 	end,
 	circuits = {
+		rot = "wallmounted",
 		connects = c.behind,
 		connects_to = {"circuit_consumer", "circuit_wire"},
 		store_connect = "meta",

@@ -174,7 +174,7 @@ local function connect_all(node)
 		for dir=1,-1,-2 do
 		for dist=1,max_dist do
 			local pos = {x=0, y=0, z=0}; pos[axis] = dir * dist
-			local to = c.relative_real_pos(node,pos)
+			local to = c.rot_relative_real_pos(node,pos)
 			to.node = minetest.get_node(to)
 
 			-- Only one connection per side
