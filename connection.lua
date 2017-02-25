@@ -59,6 +59,10 @@ end
 -- a_cd - circuit_def of node
 -- rpos - relative pos
 -- [dir] - the dir ({x=0, y=-1, z=0})
+-- returns - number encoding the connection faliure
+--           0 = doesn't connect axis
+--           1 = out of range
+--           2 = connects
 local function in_range(a_cd, rpos, dir)
 	if not dir then
 		dir = c.rpos_is_dir(rpos)
@@ -71,14 +75,14 @@ local function in_range(a_cd, rpos, dir)
 		if a_cd.connects[axis] then
 			if not (a_cd.connects[axis][1] >= rpos[axis])
 			or not (a_cd.connects[axis][2] <= rpos[axis]) then
-				return false
+				return 1
 			end
 		elseif rpos[axis] ~= 0 then
-			return false
+			return 0
 		end
 	end
 
-	return true
+	return 2
 end
 
 -- Check if the circuit-def allows a(_cd) to connect
@@ -129,8 +133,7 @@ local function connect(a,b)
 
 	local b_rpos = c.rot_relative_pos(b,a)
 	-- If neither is in the range of the other - they can't connect
-	if  not in_range(a_cd, a_rpos)
-	and not in_range(b_cd, b_rpos) then
+	if  in_range(a_cd, a_rpos) + in_range(b_cd, b_rpos) < 3 then
 		-- minetest.chat_send_all("rpos not in range")
 		return false
 	end
