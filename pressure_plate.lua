@@ -53,8 +53,8 @@ local pressure_plate = {
 		c.connect_all(pos)
 		minetest.get_node_timer(pos):start(0.1)
 	end,
-	after_destruct = function(pos, old_node)
-		pos.node = old_node
+	on_destruct = function(pos)
+		pos = c.npos(pos)
 		c.disconnect_all(pos)
 	end,
 	on_timer = function(pos,_)
