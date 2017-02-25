@@ -55,6 +55,10 @@ local function map_connect_mod(node, dir, mod)
 	end
 end
 
+local function map_math(nos, func)
+	return func(nos[1], nos[2])
+end
+
 -- Find if an rpos is in a possible connection spot
 -- a_cd - circuit_def of node
 -- rpos - relative pos
@@ -72,17 +76,29 @@ local function in_range(a_cd, rpos, dir)
 	end
 
 	for _, axis in ipairs{"x", "y", "z"} do
-		if a_cd.connects[axis] then
-			if not (a_cd.connects[axis][1] >= rpos[axis])
-			or not (a_cd.connects[axis][2] <= rpos[axis]) then
-				return 1
+		if  dir[axis] ~= 0 
+		and a_cd.connects[axis] then
+			local dist
+			if dir[axis] > 0 then
+				dist = map_math(a_cd.connects[axis], math.max)
+			else
+				dist = map_math(a_cd.connects[axis], math.min)
 			end
-		elseif rpos[axis] ~= 0 then
+
+			if dist == 0 then
+				return 0
+			end
+
+			if rpos[axis] / dist > 1 then
+				return 1
+			else
+				return 2
+			end
+		elseif dir[axis] ~= 0 then
 			return 0
 		end
 	end
-
-	return 2
+	return 0
 end
 
 -- Check if the circuit-def allows a(_cd) to connect
