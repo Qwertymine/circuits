@@ -67,7 +67,7 @@ local function in_range(a_cd, rpos, dir)
 		return false
 	end
 
-	for _, axis in ipairs({"x", "y", "z"}) do
+	for _, axis in ipairs{"x", "y", "z"} do
 		if a_cd.connects[axis] then
 			if not (a_cd.connects[axis][1] >= rpos[axis])
 			or not (a_cd.connects[axis][2] <= rpos[axis]) then
@@ -189,6 +189,16 @@ end
 c.connect_all = connect_all
 
 -- node - npos
+local function disconnect_all(node)
+	local node_cd = c.get_circuit_def(node.node.name)
+	for _, other in ipairs(c.get_all_connected(node)) do
+		disconnect(node, other)
+		set_connections(other)
+	end
+end
+c.disconnect_all = disconnect_all
+
+-- node - npos
 local function get_bit_flags(node)
 	local cd = c.get_circuit_def(node.node.name)
 	if cd.store_connect == "param" then
@@ -267,14 +277,4 @@ local function get_all_connected(node)
 	return connected
 end
 c.get_all_connected = get_all_connected
-
--- node - npos
-local function disconnect_all(node)
-	local node_cd = c.get_circuit_def(node.node.name)
-	for _, other in ipairs(get_all_connected(node)) do
-		disconnect(node, other)
-		set_connections(other)
-	end
-end
-c.disconnect_all = disconnect_all
 

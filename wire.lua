@@ -35,18 +35,15 @@ local function get_wire_network(npos)
 end
 
 c.wire_update = function(npos)
-	minetest.chat_send_all("Enter")
 	if not npos then
 		return false
 	end
 
 	local network, powered, complete = get_wire_network(npos)
-	minetest.chat_send_all("Comp")
 	if not complete then
 		return false
 	end
 
-	minetest.chat_send_all("Power")
 	if  powered
 	and c.is_on(npos) then
 		return true
@@ -55,7 +52,6 @@ c.wire_update = function(npos)
 		return true
 	end
 
-	minetest.chat_send_all("Switch")
 	local to_function
 	if powered then
 		to_function = c.get_powered
@@ -140,6 +136,9 @@ local wire = {
 		connects_to = {"circuit_consumer", "circuit_wire", "circuit_power"},
 		store_connect = "param2",
 		on_update = c.wire_update,
+		powering = function(npos, rpos)
+			return c.is_on(npos)
+		end
 	},
 }
 
