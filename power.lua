@@ -1,5 +1,7 @@
 local c = circuits
 
+-- npos - npos of powering? node
+-- node - npos of powered? node
 c.is_powering = function(npos, node)
 	local cd = c.get_circuit_def(npos.node.name)
 

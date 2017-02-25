@@ -160,7 +160,7 @@ end
 circuits.pos_facedir_relative = function(facedir,npos,pos)
 	local diff = vector.subtract(pos,npos)
 	local _,rot = circuits.facedir_to_dir(facedir)
-	return transform_pos(pos,rot)
+	return transform_pos(diff,rot)
 end
 
 -- Transforms a real pos into a pos relative to facedir node
