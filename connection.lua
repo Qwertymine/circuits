@@ -73,6 +73,8 @@ local function in_range(a_cd, rpos, dir)
 			or not (a_cd.connects[axis][2] <= rpos[axis]) then
 				return false
 			end
+		elseif rpos[axis] ~= 0 then
+			return false
 		end
 	end
 
