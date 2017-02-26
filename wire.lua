@@ -63,7 +63,7 @@ c.wire_update = function(npos)
 		if is_wire(node.node.name) then
 			local new_name = to_function(node)
 			if node.node.name ~= new_name then
-				node.node.name = to_function(node)
+				node.node.name = new_name
 				minetest.swap_node(node,node.node)
 			end
 		elseif minetest.get_item_group(node.node.name,"circuit_consumer") > 0 then

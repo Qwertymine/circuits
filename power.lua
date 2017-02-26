@@ -85,7 +85,18 @@ local function is_valid_update(npos)
 	return npos, cd
 end
 
+local no_ticks_sec = 12
+
+local timer = 0
+local steps = 0
 minetest.register_globalstep(function(dtime)
+	timer = timer + dtime
+	if timer < 1/no_ticks_sec then
+		return
+	else
+		timer = 0
+	end
+
 	if not c.pending then
 		return
 	end
