@@ -61,8 +61,11 @@ c.wire_update = function(npos)
 
 	for _, node in ipairs(network) do
 		if is_wire(node.node.name) then
-			node.node.name = to_function(node)
-			minetest.swap_node(node,node.node)
+			local new_name = to_function(node)
+			if node.node.name ~= new_name then
+				node.node.name = to_function(node)
+				minetest.swap_node(node,node.node)
+			end
 		elseif minetest.get_item_group(node.node.name,"circuit_consumer") > 0 then
 			c.update(node)
 		end
@@ -116,7 +119,6 @@ local wire = {
 				.. dir.y .. "," .. dir.z .. "}")
 		end
 		minetest.chat_send_all(tostring(powered))
-		--]]
 	end,
 	--after_place_node = function(pos,placer,itemstack,pointed_thing)
 	on_construct = function(pos)
