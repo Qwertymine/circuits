@@ -24,7 +24,6 @@ end
 
 if not c.pending then
 	c.pending = {
-		current = 1,
 		update_list = {},
 		wait = {},
 	}

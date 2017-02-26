@@ -53,9 +53,13 @@ local pressure_plate = {
 		local entity = minetest.get_objects_inside_radius(npos,0.8)
 
 		if entity and #entity >= 1 then
-			c.power_update(npos,"on")
+			if not c.is_on(npos) then
+				c.power_update(npos,"on")
+			end
 		else
-			c.power_update(npos,"off")
+			if c.is_on(npos) then
+				c.power_update(npos,"off")
+			end
 		end
 		return true
 	end,
