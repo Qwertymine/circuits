@@ -121,15 +121,6 @@ local wire = {
 		minetest.chat_send_all(tostring(powered))
 	end,
 	--after_place_node = function(pos,placer,itemstack,pointed_thing)
-	on_construct = function(pos)
-		pos.node = minetest.get_node(pos)
-		c.connect_all(pos)
-	end,
-	after_destruct = function(pos, old_node)
-		pos.node = old_node
-		c.disconnect_all(pos)
-	end,
-
 	--[[
 	--	Circuits properties definition area
 	--]]
@@ -137,7 +128,6 @@ local wire = {
 		connects = c.local_area,
 		connects_to = {"circuit_consumer", "circuit_wire", "circuit_power"},
 		store_connect = "param2",
-		on_update = c.wire_update,
 		powering = function(npos, rpos)
 			return c.is_on(npos)
 		end

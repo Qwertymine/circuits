@@ -32,19 +32,9 @@ local inverter = {
 			minetest.chat_send_all("{ " .. dir.x ..  ","
 				.. dir.y .. "," .. dir.z .. "}")
 		end
-		--]]
 	end,
 	--after_place_node = function(pos,placer,itemstack,pointed_thing)
-	on_construct = function(pos)
-		pos = c.npos(pos)
-		c.connect_all(pos)
-	end,
-	on_destruct = function(pos)
-		pos = c.npos(pos)
-		c.disconnect_all(pos)
-	end,
 	circuits = {
-		rot = "facedir",
 		base_node = "circuits:inverter",
 		connects = c.local_area,
 		connects_to = {"circuit_consumer","circuit_wire","circuit_power"},

@@ -44,31 +44,22 @@ local pressure_plate = {
 		end
 		--]]
 	end,
-	--after_place_node = function(pos,placer,itemstack,pointed_thing)
 	on_construct = function(pos)
-		pos.node = minetest.get_node(pos)
-		c.connect_all(pos)
 		minetest.get_node_timer(pos):start(0.1)
 	end,
-	on_destruct = function(pos)
-		pos = c.npos(pos)
-		c.disconnect_all(pos)
-	end,
+	--after_place_node = function(pos,placer,itemstack,pointed_thing)
 	on_timer = function(pos,_)
 		local npos = c.npos(pos)
 		local entity = minetest.get_objects_inside_radius(npos,0.8)
 
 		if entity and #entity >= 1 then
 			c.power_update(npos,"on")
-			-- power_on(npos)
 		else
 			c.power_update(npos,"off")
-			-- power_off(npos)
 		end
 		return true
 	end,
 	circuits = {
-		rot = "wallmounted",
 		connects = c.behind,
 		connects_to = {"circuit_consumer", "circuit_wire"},
 		store_connect = "meta",
