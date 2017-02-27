@@ -104,8 +104,8 @@ c.register_node = function(name, def)
 	end
 
 	-- Check param storage
-	if def.paramtype and cd.store_connect == "param" then
-		error("Storing connections in used param")
+	if def.paramtype and cd.store_connect == "param1" then
+		error("Storing connections in used param1")
 	elseif def.paramtype2 and cd.store_connect == "param2" then
 		error("Storing connections in used param2")
 	end

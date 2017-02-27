@@ -4,7 +4,7 @@ local lamp = {
 	description = "Lamp",
 	drawtype = "normal",
 	tiles = {"default_mese_block.png"
-		.. "^(default_rail_crossing.png)"
+		.. "^(carts_rail_crossing.png)"
 		.. "^default_glass.png"
 	},
 	use_texture_alpha = true,
@@ -16,14 +16,6 @@ local lamp = {
 	walkable = true,
 	groups = {dig_immediate=3,circuit_consumer=1},
 	connects_to = {"group:circuit_wire","group:circuit_power"},
-	on_construct = function(pos)
-		pos.node = minetest.get_node(pos)
-		c.connect_all(pos)
-	end,
-	after_destruct = function(pos, old_node)
-		pos.node = old_node
-		c.disconnect_all(pos)
-	end,
 	circuits = {
 		connects = c.local_area,
 		connects_to = {"circuit_wire", "circuit_power"},
@@ -57,7 +49,7 @@ local lamp = {
 c.register_on_off("circuits:lamp",lamp,{},
 {
 	tiles = {"default_mese_block.png"
-		.. "^(default_rail_crossing.png)"
+		.. "^(carts_rail_crossing.png)"
 		.. "^[colorize:#111:160"
 		.. "^default_glass.png"
 	},

@@ -43,8 +43,8 @@ end
 local function map_connect_mod(node, dir, mod)
 	local cd = c.get_circuit_def(node.node.name)
 
-	if cd.store_connect == "param" then
-		node.node.param = mod(node.node.param, dir)
+	if cd.store_connect == "param1" then
+		node.node.param1 = mod(node.node.param1, dir)
 
 	elseif cd.store_connect == "param2" then
 		node.node.param2 = mod(node.node.param2, dir)
@@ -118,7 +118,7 @@ end
 local function set_connections(npos)
 	local cd = c.get_circuit_def(npos.node.name)
 	
-	if cd.store_connect == "param"
+	if cd.store_connect == "param1"
 	or cd.store_connect == "param2" then
 		minetest.swap_node(npos, npos.node)
 
@@ -224,8 +224,8 @@ c.disconnect_all = disconnect_all
 -- node - npos
 local function get_bit_flags(node)
 	local cd = c.get_circuit_def(node.node.name)
-	if cd.store_connect == "param" then
-		return node.node.param
+	if cd.store_connect == "param1" then
+		return node.node.param1
 
 	elseif cd.store_connect == "param2" then
 		return node.node.param2
