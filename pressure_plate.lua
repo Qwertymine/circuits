@@ -33,17 +33,6 @@ local pressure_plate = {
 	is_ground_content = false,
 	walkable = false,
 	groups = {dig_immediate=3,source=1, circuit_power=1},
-	on_rightclick = function(pos,node)
-		local flags = minetest.get_meta(pos):get_int("connect")
-		pos.node = node
-		minetest.chat_send_all(flags)
-		for _,real in pairs(c.get_all_connected(pos)) do
-			local dir = c.rot_relative_pos(pos, real)
-			minetest.chat_send_all("{ " .. dir.x ..  ","
-				.. dir.y .. "," .. dir.z .. "}")
-		end
-		--]]
-	end,
 	on_construct = function(pos)
 		minetest.get_node_timer(pos):start(0.1)
 	end,

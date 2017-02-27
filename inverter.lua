@@ -23,16 +23,6 @@ local inverter = {
 	paramtype2 = "facedir",
 	is_ground_content = false,
 	groups = {dig_immediate=3, circuit_consumer=1, circuit_power=1},
-	on_rightclick = function(pos,node)
-		local flags = minetest.get_meta(pos):get_int("connect")
-		pos.node = node
-		minetest.chat_send_all(flags)
-		for _,real in pairs(c.get_all_connected(pos)) do
-			local dir = c.rot_relative_pos(pos, real)
-			minetest.chat_send_all("{ " .. dir.x ..  ","
-				.. dir.y .. "," .. dir.z .. "}")
-		end
-	end,
 	--after_place_node = function(pos,placer,itemstack,pointed_thing)
 	circuits = {
 		base_node = "circuits:inverter",
