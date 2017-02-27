@@ -68,9 +68,9 @@ c.register_on_off("circuits:wire",wire,{},
 })
 
 local colours = {
-	red = "^[colorize:#F00:120",
-	green = "^[colorize:#0F0:120",
-	blue = "^[colorize:#00F:120",
+	red = "^[colorize:#F00:160",
+	green = "^[colorize:#0F0:160",
+	blue = "^[colorize:#00F:160",
 }
 
 for _, colour in ipairs{"red", "green", "blue"} do
@@ -84,7 +84,7 @@ for _, colour in ipairs{"red", "green", "blue"} do
 	                  , "circuit_consumer", "circuit_power"}
 	c.register_on_off("circuits:wire_" .. colour,def,{},
 	{
-		tiles = {"default_mese_block.png^[colorize:#111:160" .. col_string},
+		tiles = {"default_mese_block.png" .. col_string .. "^[colorize:#111:160"},
 	})
 end
 
