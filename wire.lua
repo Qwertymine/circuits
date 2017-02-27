@@ -25,7 +25,8 @@ local function get_wire_network(npos)
 		end
 		if minetest.get_item_group(item.node.name,"circuit_power") > 0 then
 			for _, node in ipairs(c.get_all_connected(item)) do
-				if seen[c.hash_pos(node)] then
+				if seen[c.hash_pos(node)] 
+				and is_wire(node.node.name) then
 					powered = powered or c.is_powering(item, node)
 				end
 			end
