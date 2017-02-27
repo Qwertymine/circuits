@@ -67,3 +67,24 @@ c.register_on_off("circuits:wire",wire,{},
 	tiles = {"default_mese_block.png^[colorize:#111:160"},
 })
 
+local colours = {
+	red = "^[colorize:#F00:120",
+	green = "^[colorize:#0F0:120",
+	blue = "^[colorize:#00F:120",
+}
+
+for _, colour in ipairs{"red", "green", "blue"} do
+	local def = table.copy(wire)
+	local col_string = colours[colour]
+	def.tiles[1] = def.tiles[1] .. col_string
+	def.groups = {dig_immediate=3,["circuit_wire_" .. colour]=1,circuit_wire=1}
+	def.connects_to = {"group:circuit_raw_wire", "group:circuit_wire_" .. colour
+	                  , "group:circuit_consumer", "group:circuit_power"}
+	def.circuits.connects_to = {"circuit_raw_wire", "circuit_wire_" .. colour
+	                  , "circuit_consumer", "circuit_power"}
+	c.register_on_off("circuits:wire_" .. colour,def,{},
+	{
+		tiles = {"default_mese_block.png^[colorize:#111:160" .. col_string},
+	})
+end
+
