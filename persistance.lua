@@ -2,14 +2,13 @@ local c = circuits
 local database_path = minetest.get_worldpath() .. "/circuits_db.txt"
 
 --[[ {
---	[1..max_update_time] = update_list
---
---	producer = {updates}
---	wire     = {updates}
---	consumer = {updates}
+--	update_list = {
+--		producer = {updates}
+--		wire     = {updates}
+--		consumer = {updates}
+	}
 --
 --	wait = {}
---	longstay = {} 	-- Storage for updates > max_update_time
 --   }
 --]]
 
